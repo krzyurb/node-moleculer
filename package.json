@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "workspaces": [
+    "api",
+    "packages/**/",
+    "services/**/"
+  ],
+  "scripts": {
+    "initialize": "yarn install",
+    "up": "cd ./infrastructure && make up",
+    "logs": "cd ./infrastructure && make logs",
+    "down": "cd ./infrastructure && make down"
+  }
+}

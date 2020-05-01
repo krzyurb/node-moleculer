@@ -1,0 +1,77 @@
+version: "3.7"
+
+x-envs: &envs
+  NODE_ENV: 'development'
+  BROKER_HOST: 'rabbitmq'
+  BROKER_USERNAME: 'rabbitmq'
+  BROKER_PASSWORD: 'rabbitmq'
+
+x-microservice-container: &microservice-container
+  container_name: backend-sample.api.dev.adn.local
+  image: node:lts
+  restart: unless-stopped
+  environment: *envs
+  volumes:
+    - ../:/project
+  networks:
+    - backend
+  depends_on:
+    - rabbitmq
+
+services:
+  rabbitmq:
+    image: 'bitnami/rabbitmq:latest'
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_USERNAME: 'rabbitmq'
+      RABBITMQ_PASSWORD: 'rabbitmq'
+    ports:
+      - 15672:15672
+    networks:
+      - backend
+
+  api:
+    build:
+      context: ../
+      dockerfile: ./infrastructure/api/Dockerfile
+    image: node:lts
+    container_name: api
+    restart: unless-stopped
+    environment: *envs
+    ports:
+      - 8080:3000
+    volumes:
+      - ../:/project
+    networks:
+      - backend
+    depends_on:
+      - rabbitmq
+    command: ["yarn", "--cwd", "api", "dev"]
+
+  plants-service:
+    <<: *microservice-container
+    build:
+      context: ../
+      dockerfile: ./infrastructure/services/plants/Dockerfile
+    container_name: plants-service
+    environment:
+      <<: *envs
+      DB_URL: mongodb://plants-db:27017/plants
+    command: ["yarn", "--cwd", "services/plants", "dev"]
+
+  plants-db:
+    image: mongo:latest
+    container_name: plants-db
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+    networks:
+      - backend
+    volumes:
+      - plants-db-data:/data/db
+
+networks:
+  backend:
+
+volumes:
+  plants-db-data:

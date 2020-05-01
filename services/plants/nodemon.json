@@ -1,0 +1,9 @@
+{
+  "watch": [
+    "/project/services/plants",
+    "/project/packages/"
+  ],
+  "ext": "ts",
+  "ignore": ["*.test.ts", "**/node_modules"],
+  "exec": "ts-node ./src/index.ts"
+}
