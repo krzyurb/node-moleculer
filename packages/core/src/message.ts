@@ -1,28 +1,26 @@
 import { v1 } from 'uuid';
 import { validate, validator } from './validator';
 
-export enum EventTypes {
-  CREATE = 'create',
-  GET = 'get',
-  UPDATE = 'update',
-  DELETE = 'delete',
+export enum MessageTypes {
+  QUERY = 'query',
+  COMMAND = 'command',
 }
 
-export interface IEvent<T = unknown> {
+export interface IMessage<T = unknown> {
   id: string;
-  type: EventTypes;
+  type: MessageTypes;
   timestamp: number;
   data: T;
 }
 
-export const buildEvent = (params: Omit<IEvent, 'id' | 'timestamp'>): IEvent => ({
+export const buildMessage = <T>(params: Omit<IMessage, 'id' | 'timestamp'>): IMessage<T> => ({
   id: v1(),
   type: params.type,
   timestamp: Date.now(),
-  data: params.data,
+  data: params.data as T,
 });
 
-export const checkEvent = (event: unknown): IEvent =>
+export const checkMessage = (message: unknown): IMessage =>
   validate(
     validator.object({
       id: validator.string(),
@@ -30,5 +28,5 @@ export const checkEvent = (event: unknown): IEvent =>
       timestamp: validator.number(),
       data: validator.any(),
     }),
-    event,
+    message,
   );

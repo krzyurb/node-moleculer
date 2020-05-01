@@ -5,11 +5,11 @@ export interface IGetPlantByIdData {
   id: string;
 }
 
-export const getById = actionHandler<IGetPlantByIdData>(async event => {
+export const getById = actionHandler<IGetPlantByIdData>(async message => {
   // Read input
   const {
     data: { id },
-  } = event;
+  } = message;
 
   // Fetch from db
   const document = await getPlantById(id);

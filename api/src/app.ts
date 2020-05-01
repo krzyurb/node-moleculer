@@ -1,15 +1,15 @@
 import { ApolloServer } from 'apollo-server';
-import { ServiceBroker } from '@project/core';
+import { IBroker } from '@project/core';
 
 import typeDefs from './schema';
 import resolvers from './resolvers';
 
 interface IBuildServerOptions {
-  broker: ServiceBroker;
+  broker: IBroker;
 }
 
 export interface IServerContext {
-  broker: ServiceBroker;
+  broker: IBroker;
 }
 
 export const buildServer = ({ broker }: IBuildServerOptions): ApolloServer => {

@@ -6,9 +6,9 @@ export interface ICreatePlantData {
   description: string;
 }
 
-export const create = actionHandler<ICreatePlantData>(async event => {
+export const create = actionHandler<ICreatePlantData>(async message => {
   // Read input
-  const { data } = event;
+  const { data } = message;
 
   // Fetch from db
   const document = await createPlant(data);

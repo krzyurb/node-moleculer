@@ -1,17 +1,17 @@
 import { Context } from 'moleculer';
-import { IEvent } from '@project/core';
-import { checkEvent } from './event';
+import { IMessage } from '@project/core';
+import { checkMessage } from './message';
 
-export type ActionHandler<P> = (event: IEvent<P>, ctx: Context<IEvent<P>>) => unknown;
+export type ActionHandler<P> = (message: IMessage<P>, ctx: Context<IMessage<P>>) => unknown;
 
 export const actionHandler = <P>(handler: ActionHandler<P>) => (
-  ctx: Context<IEvent<P>>,
+  ctx: Context<IMessage<P>>,
 ): unknown => {
   try {
-    checkEvent(ctx.params);
+    checkMessage(ctx.params);
     return handler(ctx.params, ctx);
   } catch (error) {
     console.log(error);
-    return { error, event: ctx.params };
+    return { error, message: ctx.params };
   }
 };
