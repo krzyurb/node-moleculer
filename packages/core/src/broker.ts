@@ -1,16 +1,23 @@
 import { ServiceBroker, ServiceSchema } from 'moleculer';
-import { IMessage } from './message';
+import { IMessage, buildMessage, MessageTypes } from './message';
 
 const keys = ['BROKER_HOST', 'BROKER_USERNAME', 'BROKER_PASSWORD'];
 
-type IBrokerConfig = {
+export interface IBrokerConfig {
   BROKER_HOST: string;
   BROKER_USERNAME: string;
   BROKER_PASSWORD: string;
-};
+}
+
+export interface IBrokerCallParams<P> {
+  service: string;
+  action: string;
+  data: P;
+}
 
 export interface IBroker {
-  call: <R = unknown>(service: string, action: string, message: IMessage) => Promise<R>;
+  query: <R = unknown, P = unknown>(params: IBrokerCallParams<P>) => Promise<R>;
+  command: <R = unknown, P = unknown>(params: IBrokerCallParams<P>) => Promise<R>;
   start: () => Promise<void>;
   buildService: (options: ServiceSchema) => ServiceBroker;
 }
@@ -46,8 +53,24 @@ export const buildBroker = (): IBroker => {
 
   return {
     start: (): Promise<void> => broker.start(),
-    call: <R = unknown>(service: string, action: string, message: IMessage): Promise<R> =>
-      broker.call<R, IMessage>([service, action].join('.'), message),
+    query: <R = unknown, P = unknown>({
+      service,
+      action,
+      data,
+    }: IBrokerCallParams<P>): Promise<R> =>
+      broker.call<R, IMessage>(
+        [service, action].join('.'),
+        buildMessage<P>({ data, type: MessageTypes.QUERY }),
+      ),
+    command: <R = unknown, P = unknown>({
+      service,
+      action,
+      data,
+    }: IBrokerCallParams<P>): Promise<R> =>
+      broker.call<R, IMessage>(
+        [service, action].join('.'),
+        buildMessage<P>({ data, type: MessageTypes.COMMAND }),
+      ),
     buildService: (options: ServiceSchema): ServiceBroker =>
       broker.createService({
         started: () => Promise.resolve(console.log(`${options.actions} service started`)),

@@ -26,10 +26,10 @@ Monorepo Node.js microservices architecture.
 ### Set up local environment
 
 ```sh
-  yarn init  # start whole infrastructure
-  yarn up    # start whole infrastructure
-  yarn logs  # show logs
-  yarn down  # shut down docker compose
+  yarn initialize  # start whole infrastructure
+  yarn up          # start whole infrastructure
+  yarn logs        # show logs
+  yarn down        # shut down docker compose
 ```
 
 ### RabbitMQ UI
