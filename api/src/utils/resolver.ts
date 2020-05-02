@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { ResolverFn } from 'apollo-server';
 import { IServerContext } from '../app';
-// import { ResolverFn } from 'apollo-server';
 
 export type ResolverHandler = (
   parent?: any,
@@ -9,7 +9,7 @@ export type ResolverHandler = (
   info?: any,
 ) => unknown;
 
-export const resolverHandler = (handler: ResolverHandler) => (
+export const resolverHandler = (handler: ResolverHandler): ResolverFn => (
   parent?: any,
   args?: any,
   context?: IServerContext,
