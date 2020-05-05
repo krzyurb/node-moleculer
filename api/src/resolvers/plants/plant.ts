@@ -9,7 +9,7 @@ interface IPlantQueryArgs {
 
 export default resolverHandler(
   async (parent: undefined, args: IPlantQueryArgs, context: IServerContext) => {
-    const plant = await context.broker.command<IPlant, IPlantQueryArgs>({
+    const plant = await context.broker.query<IPlant, IPlantQueryArgs>({
       service: 'plants',
       action: 'getById',
       data: { id: args.id },
