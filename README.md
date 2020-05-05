@@ -32,6 +32,13 @@ Monorepo Node.js microservices architecture.
   yarn down        # shut down docker compose
 ```
 
+## Queries examples
+
+[![Run in Insomnia}](https://insomnia.rest/images/run.svg)](https://insomnia.rest/run/?label=node-microservices&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fkrzyurb%2Fnode-microservices%2Fmaster%2Fdocs%2Finsomnia.json)
+
+If you have installed [Insomnia](https://insomnia.rest/) rest client you can check example queries.
+
+
 ### RabbitMQ UI
 
 [Management UI Access](http://localhost:15672/)
