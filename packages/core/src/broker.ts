@@ -1,5 +1,8 @@
 import { ServiceBroker, ServiceSchema } from 'moleculer';
+
 import { IMessage, buildMessage, MessageTypes } from './message';
+import { InternalError, buildInternalError, InternalErrorTypes } from './error';
+import { IServiceResponse } from './response';
 
 const keys = ['BROKER_HOST', 'BROKER_USERNAME', 'BROKER_PASSWORD'];
 
@@ -16,8 +19,8 @@ export interface IBrokerCallParams<P> {
 }
 
 export interface IBroker {
-  query: <R = unknown, P = unknown>(params: IBrokerCallParams<P>) => Promise<R>;
-  command: <R = unknown, P = unknown>(params: IBrokerCallParams<P>) => Promise<R>;
+  query: <R = unknown, P = unknown>(params: IBrokerCallParams<P>) => Promise<IServiceResponse<R>>;
+  command: <R = unknown, P = unknown>(params: IBrokerCallParams<P>) => Promise<IServiceResponse<R>>;
   start: () => Promise<void>;
   buildService: (options: ServiceSchema) => ServiceBroker;
 }
@@ -57,8 +60,8 @@ export const buildBroker = (): IBroker => {
       service,
       action,
       data,
-    }: IBrokerCallParams<P>): Promise<R> =>
-      broker.call<R, IMessage>(
+    }: IBrokerCallParams<P>): Promise<IServiceResponse<R>> =>
+      broker.call<IServiceResponse<R>, IMessage>(
         [service, action].join('.'),
         buildMessage<P>({ data, type: MessageTypes.QUERY }),
       ),
@@ -66,14 +69,40 @@ export const buildBroker = (): IBroker => {
       service,
       action,
       data,
-    }: IBrokerCallParams<P>): Promise<R> =>
-      broker.call<R, IMessage>(
+    }: IBrokerCallParams<P>): Promise<IServiceResponse> =>
+      broker.call<IServiceResponse, IMessage>(
         [service, action].join('.'),
         buildMessage<P>({ data, type: MessageTypes.COMMAND }),
       ),
     buildService: (options: ServiceSchema): ServiceBroker =>
       broker.createService({
         started: () => Promise.resolve(console.log(`${options.actions} service started`)),
+        hooks: {
+          error: {
+            '*': (ctx, error): any => {
+              if (!(error instanceof InternalError)) {
+                console.error(error);
+              }
+
+              const errorToReturn =
+                error instanceof InternalError
+                  ? error
+                  : buildInternalError({
+                      code: 'internal-error',
+                      message: 'Internal Error',
+                      type: InternalErrorTypes.INTERNAL,
+                    });
+
+              return {
+                timestamp: Date.now(),
+                actionName: ctx.action.name,
+                messageId: ctx.params.id,
+                error: errorToReturn.toObject(),
+                success: false,
+              } as IServiceResponse;
+            },
+          },
+        },
         ...options,
       }).broker,
   };

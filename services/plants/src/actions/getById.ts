@@ -1,22 +1,25 @@
-import { actionHandler } from '@project/core';
+import { actionHandler, InternalErrorTypes, buildInternalError } from '@project/core';
 import { getPlantById } from '../db';
+import { IPlant } from '@project/shared';
 
 export interface IGetPlantByIdData {
   id: string;
 }
 
-export const getById = actionHandler<IGetPlantByIdData>(async message => {
-  // Read input
+export const getById = actionHandler<IGetPlantByIdData, Promise<IPlant>>(async message => {
   const {
     data: { id },
   } = message;
 
-  // Fetch from db
   const document = await getPlantById(id);
 
-  // Build response
   if (!document) {
-    return null;
+    throw buildInternalError({
+      code: 'plant-not-found',
+      message: 'Plant Not found',
+      type: InternalErrorTypes.OTHER,
+      data: { id },
+    });
   }
 
   return {

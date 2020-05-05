@@ -10,12 +10,12 @@ interface ICreatePlantMutationArgs {
 
 export default resolverHandler(
   async (parent: undefined, args: ICreatePlantMutationArgs, context: IServerContext) => {
-    const plant = await context.broker.command<IPlant, ICreatePlantMutationArgs>({
+    const response = await context.broker.command<IPlant, ICreatePlantMutationArgs>({
       service: 'plants',
       action: 'create',
       data: args,
     });
 
-    return plant;
+    return response.data;
   },
 );

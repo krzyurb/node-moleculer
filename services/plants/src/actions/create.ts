@@ -1,4 +1,5 @@
 import { actionHandler } from '@project/core';
+import { IPlant } from '@project/shared';
 import { createPlant } from '../db';
 
 export interface ICreatePlantData {
@@ -6,14 +7,11 @@ export interface ICreatePlantData {
   description: string;
 }
 
-export const create = actionHandler<ICreatePlantData>(async message => {
-  // Read input
+export const create = actionHandler<ICreatePlantData, Promise<IPlant>>(async message => {
   const { data } = message;
 
-  // Fetch from db
   const document = await createPlant(data);
 
-  // Build response
   return {
     id: document.id,
     name: document.name,
